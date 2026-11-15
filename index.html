@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نموذج جمع البيانات - جمعية فلسطين الغد</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#1a3d6b; --green-l:#2563ab; --green-p:#e8f0fa;
+  --dark:#1a1a1a; --gray:#6b7280; --gray-l:#f3f4f6;
+  --white:#fff; --border:#d1d5db; --error:#dc2626;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Cairo',sans-serif; background:linear-gradient(160deg,#f0f3f7,#eef3fa,#f5f0fb);
+  min-height:100vh; color:var(--dark); padding:28px 14px; }
+.page-header { text-align:center; margin-bottom:36px; }
+.logo { width:150px; height:150px; display:inline-flex; align-items:center; justify-content:center; margin-bottom:10px; }
+.logo img { max-width:100%; max-height:100%; object-fit:contain; }
+h1 { font-size:26px; font-weight:900; color:var(--green); margin-bottom:4px; }
+.subtitle { font-size:13px; color:var(--gray); }
+.divider { width:80px; height:3px; background:linear-gradient(90deg,var(--green),#c9a227); border-radius:2px; margin:12px auto 0; }
+form { max-width:900px; margin:0 auto; display:flex; flex-direction:column; gap:24px; }
+.card { background:var(--white); border-radius:18px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,.07); border:1px solid rgba(0,0,0,.06); }
+.card-head { padding:14px 24px; display:flex; align-items:center; gap:10px; color:#fff; background:linear-gradient(135deg,var(--green),var(--green-l)); }
+.card-head .ico { font-size:20px; }
+.card-head .ttl { font-size:16px; font-weight:700; }
+.card-body { padding:22px 24px; display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.fg { display:flex; flex-direction:column; gap:5px; }
+.fg.full { grid-column:1/-1; }
+label { font-size:12.5px; font-weight:700; display:flex; align-items:center; gap:5px; }
+.req { color:var(--error); font-size:14px; }
+input,select,textarea { width:100%; padding:10px 13px; border:1.5px solid var(--border); border-radius:9px;
+  font-family:'Cairo',sans-serif; font-size:13.5px; color:var(--dark); background:var(--gray-l); transition:all .2s; outline:none; }
+input:focus,select:focus,textarea:focus { border-color:#60a5fa; background:#fff; box-shadow:0 0 0 3px rgba(96,165,250,.15); }
+input.err,select.err,textarea.err { border-color:var(--error); background:#fff5f5; }
+input[readonly] { background:#e5e7eb; color:#4b5563; }
+textarea { resize:vertical; min-height:72px; }
+.hint { font-size:11px; color:var(--gray); }
+.emsg { font-size:11.5px; color:var(--error); font-weight:700; display:none; }
+.emsg.show { display:block; }
+.names { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.names label { font-weight:500; font-size:11.5px; color:var(--gray); }
+.file-box { border:2px dashed var(--border); border-radius:9px; padding:18px 12px; text-align:center; background:var(--gray-l); }
+.file-box.has-file { border-color:#2a7a5a; background:#edf7f2; }
+.file-box.err { border-color:var(--error); }
+.file-name { font-size:13px; font-weight:700; color:#2a7a5a; margin-top:8px; word-break:break-all; }
+.file-cur a { color:var(--green-l); font-weight:700; }
+.btn-file { background:linear-gradient(135deg,var(--green),var(--green-l)); color:#fff; border:none; padding:10px 28px;
+  border-radius:50px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:700; cursor:pointer; }
+.submit-wrap { text-align:center; padding-bottom:8px; }
+.btn { background:linear-gradient(135deg,var(--green),var(--green-l)); color:#fff; border:none; padding:15px 52px; font-size:16px;
+  font-weight:700; font-family:'Cairo',sans-serif; border-radius:50px; cursor:pointer; box-shadow:0 6px 24px rgba(26,61,107,.35); transition:all .25s; }
+.btn:hover { transform:translateY(-2px); }
+.btn:disabled { opacity:.65; cursor:not-allowed; transform:none; }
+.note { background:#fffbeb; border:1px solid #fcd34d; border-radius:10px; padding:12px 18px; font-size:12.5px; color:#92400e; max-width:900px; margin:0 auto 18px; }
+.consent-wrap { background:#fff; border-radius:14px; padding:18px 22px; border:2px solid var(--border); display:flex; align-items:flex-start; gap:12px; cursor:pointer; }
+.consent-wrap.err-consent { border-color:var(--error); background:#fff5f5; }
+.consent-wrap input { width:20px; height:20px; flex-shrink:0; margin-top:2px; accent-color:var(--green); padding:0; border:none; box-shadow:none; background:none; }
+.consent-text { font-size:13px; font-weight:600; line-height:1.7; }
+.consent-err { font-size:12px; color:var(--error); font-weight:700; display:none; margin:-14px 34px 0 0; }
+.consent-err.show { display:block; }
+.toast { position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-130px); padding:14px 26px; border-radius:12px;
+  font-size:14px; font-weight:700; z-index:9999; transition:transform .4s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 8px 28px rgba(0,0,0,.2); max-width:90vw; text-align:center; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.ok { background:#2a7a5a; color:#fff; }
+.toast.fail { background:var(--error); color:#fff; }
+/* شاشة التحقق من الهوية */
+#check-screen, #success-screen { position:fixed; inset:0; background:linear-gradient(160deg,#f0f3f7,#eef3fa,#f5f0fb);
+  display:flex; align-items:center; justify-content:center; padding:2rem; overflow:auto; }
+#check-screen { z-index:700; }
+#success-screen { z-index:800; display:none; }
+#success-screen.visible { display:flex; }
+.check-card, .success-card { background:#fff; border-radius:20px; box-shadow:0 8px 32px rgba(0,0,0,.12); padding:2.5rem 2rem;
+  max-width:420px; width:100%; text-align:center; border-top:5px solid var(--green); }
+.success-card { border-top-color:#2a7a5a; }
+.check-card h2 { font-size:20px; font-weight:900; color:var(--green); margin-bottom:4px; }
+.check-card .job { font-size:14px; font-weight:700; color:var(--green-l); margin-bottom:6px; }
+.check-card p { font-size:13px; color:var(--gray); margin-bottom:20px; }
+.check-actions { display:flex; gap:10px; }
+.check-actions button { flex:1; padding:13px; border-radius:50px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:700; cursor:pointer; }
+.btn-new { background:linear-gradient(135deg,var(--green),var(--green-l)); color:#fff; border:none; }
+.btn-edit { background:#f3f4f6; color:#374151; border:1px solid var(--border); }
+.check-msg { margin-top:14px; border-radius:10px; padding:12px; font-size:13px; font-weight:700; display:none; }
+.check-msg.show { display:block; }
+.check-msg.warn { background:#fff7ed; border:1px solid #fb923c; color:#c2410c; }
+.check-msg.bad { background:#fef2f2; border:1px solid #fca5a5; color:#b91c1c; }
+.success-icon { font-size:64px; margin-bottom:16px; }
+.success-title { font-size:22px; font-weight:900; color:#2a7a5a; margin-bottom:10px; }
+.success-sub { font-size:14px; color:var(--gray); }
+@media(max-width:640px){ .card-body { grid-template-columns:1fr; } h1 { font-size:20px; } .btn { padding:13px 32px; font-size:14px; } }
+</style>
+</head>
+<body>
+
+<div id="success-screen">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <div class="success-title">تم إرسال بياناتك بنجاح!</div>
+    <div class="success-sub">شكراً لك، تم حفظ بياناتك وسيتم التواصل معك عند الحاجة.</div>
+  </div>
+</div>
+
+<!-- شاشة التحقق من رقم الهوية -->
+<div id="check-screen">
+  <div class="check-card">
+    <div class="logo" style="width:110px;height:110px;margin:0 auto 10px"><img src="logo2.png" alt="جمعية فلسطين الغد"></div>
+    <h2>نموذج جمع البيانات</h2>
+    <p>أدخل رقم هويتك ثم اختر العملية</p>
+    <div class="fg" style="text-align:right;margin-bottom:14px">
+      <label>رقم الهوية <span class="req">*</span></label>
+      <input type="text" id="check-id" placeholder="9 أرقام" maxlength="9" inputmode="numeric" autocomplete="off">
+    </div>
+    <div class="check-actions">
+      <button class="btn-new" id="btn-new" type="button">📝 تسجيل جديد</button>
+      <button class="btn-edit" id="btn-edit" type="button">✏️ تعديل البيانات</button>
+    </div>
+    <div class="check-msg" id="check-msg"></div>
+  </div>
+</div>
+
+<div class="page-header">
+  <div class="logo"><img src="logo2.png" alt="جمعية فلسطين الغد"></div>
+  <div style="font-size:12px;color:var(--gray);margin-bottom:6px">جمعية فلسطين الغد للتنمية المجتمعية</div>
+  <h1>نموذج جمع البيانات</h1>
+  <p class="subtitle">يرجى تعبئة البيانات بدقة</p>
+  <div class="divider"></div>
+</div>
+
+<div class="note">⚠️ الحقول المعلّمة بـ <span style="color:red;font-weight:700">*</span> إلزامية. تحقق من البيانات قبل الإرسال.</div>
+
+<form id="frm" novalidate>
+  <div class="card">
+    <div class="card-head"><span class="ico">👤</span><span class="ttl">البيانات الشخصية</span></div>
+    <div class="card-body">
+      <div class="fg full">
+        <label>الاسم الرباعي <span class="req">*</span></label>
+        <div class="names">
+          <div class="fg"><label>الاسم الأول</label><input type="text" id="n1" placeholder="الاسم الأول"></div>
+          <div class="fg"><label>الاسم الثاني</label><input type="text" id="n2" placeholder="الاسم الثاني"></div>
+          <div class="fg"><label>الاسم الثالث</label><input type="text" id="n3" placeholder="الاسم الثالث"></div>
+          <div class="fg"><label>اسم العائلة</label><input type="text" id="n4" placeholder="اسم العائلة"></div>
+        </div>
+        <span class="emsg" id="e_names">⚠ يرجى إدخال الاسم الرباعي كاملاً</span>
+      </div>
+      <div class="fg">
+        <label>رقم الهوية <span class="req">*</span></label>
+        <input type="text" id="nid" maxlength="9" inputmode="numeric" readonly>
+        <span class="hint">من شاشة التحقق، 9 أرقام</span>
+      </div>
+      <div class="fg">
+        <label>رقم الجوال <span class="req">*</span></label>
+        <input type="text" id="phone" placeholder="مثال: 0591234567" maxlength="10" inputmode="tel">
+        <span class="emsg" id="e_phone">⚠ يجب أن يكون 10 أرقام ويبدأ بـ 05</span>
+      </div>
+      <div class="fg">
+        <label>تاريخ الميلاد <span class="req">*</span></label>
+        <input type="date" id="dob">
+        <span class="emsg" id="e_dob">⚠ يرجى إدخال تاريخ ميلاد صحيح</span>
+      </div>
+      <div class="fg">
+        <label>المؤهل العلمي <span class="req">*</span></label>
+        <select id="edu">
+          <option value="">اختر المؤهل العلمي</option>
+          <option>أقل من ثانوية عامة</option>
+          <option>ثانوية عامة</option>
+          <option>دبلوم</option>
+          <option>بكالوريوس</option>
+          <option>ماجستير</option>
+          <option>دكتوراه</option>
+        </select>
+        <span class="emsg" id="e_edu">⚠ يرجى اختيار المؤهل العلمي</span>
+      </div>
+      <div class="fg full">
+        <label>العنوان <span class="req">*</span></label>
+        <textarea id="address" placeholder="المحافظة / المدينة / الحي / الشارع..."></textarea>
+        <span class="emsg" id="e_address">⚠ يرجى إدخال العنوان</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">💳</span><span class="ttl">بيانات المحفظة</span></div>
+    <div class="card-body">
+      <div class="fg">
+        <label>رقم المحفظة <span class="req">*</span></label>
+        <input type="text" id="wallet" placeholder="رقم المحفظة" maxlength="20" inputmode="numeric">
+        <span class="emsg" id="e_wallet">⚠ يرجى إدخال رقم محفظة صحيح (أرقام فقط)</span>
+      </div>
+      <div class="fg">
+        <label>اسم صاحب المحفظة <span class="req">*</span></label>
+        <input type="text" id="wowner" placeholder="الاسم كما هو مسجّل في المحفظة">
+        <span class="emsg" id="e_wowner">⚠ يرجى إدخال اسم صاحب المحفظة</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="consent-wrap" id="consent-wrap">
+    <input type="checkbox" id="consent">
+    <span class="consent-text">أقرّ بصحة جميع البيانات والمعلومات والوثائق المقدمة، وأوافق على استخدامها لأغراض الجمعية.</span>
+  </div>
+  <div class="consent-err" id="consent-err">⚠ يجب الموافقة على الإقرار قبل الإرسال</div>
+
+  <div class="submit-wrap"><button type="submit" class="btn" id="sbtn">💾 إرسال البيانات</button></div>
+</form>
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKlBkDYsqLRwvISSFSHkI9TViBpKX1fOkzgEWgC5xnDeYlV9ZAYGtBVVj4SeNVE-4i/exec';
+
+const $ = id => document.getElementById(id);
+const d9 = v => /^\d{9}$/.test(v);
+const phoneOk = v => /^05\d{8}$/.test(v);
+const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+
+let editRow = 0;       // رقم الصف عند التعديل
+
+function toast(msg, type) {
+  const t = $('toast');
+  t.textContent = (type === 'ok' ? '✅ ' : '❌ ') + msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 4500);
+}
+function setErr(id, show) {
+  $(id)?.classList.toggle('err', show);
+  $('e_' + id)?.classList.toggle('show', show);
+  return !show;
+}
+function checkMsg(text, cls) {
+  const m = $('check-msg');
+  m.textContent = text; m.className = 'check-msg show ' + cls;
+}
+['check-id', 'nid', 'phone', 'wallet'].forEach(id =>
+  $(id).addEventListener('input', function () { this.value = this.value.replace(/\D/g, ''); $('check-msg').className = 'check-msg'; }));
+
+async function api(params) {
+  const res = await fetch(SCRIPT_URL + '?' + new URLSearchParams(params));
+  return res.json();
+}
+
+// ── شاشة التحقق ──
+function busy(on) { $('btn-new').disabled = $('btn-edit').disabled = on; }
+function openForm() { $('check-screen').style.display = 'none'; }
+
+$('btn-new').addEventListener('click', async () => {
+  const id = $('check-id').value.trim();
+  if (!d9(id)) return checkMsg('أدخل رقم هوية من 9 أرقام', 'bad');
+  busy(true);
+  try {
+    const r = await api({ id });
+    if (r.found) return checkMsg('هذه الهوية مسجّلة مسبقاً. اختر «تعديل البيانات» لتعديل بياناتك.', 'warn');
+    if (r.error) throw new Error(r.error);
+    editRow = 0; $('nid').value = id; openForm();
+  } catch (e) { checkMsg('تعذّر الاتصال، تحقق من الإنترنت وحاول مجدداً', 'bad'); }
+  finally { busy(false); }
+});
+
+$('btn-edit').addEventListener('click', async () => {
+  const id = $('check-id').value.trim();
+  if (!d9(id)) return checkMsg('أدخل رقم هوية من 9 أرقام', 'bad');
+  busy(true);
+  try {
+    const r = await api({ id, edit: 1 });
+    if (!r.found) return checkMsg('لا توجد بيانات مسجّلة بهذه الهوية', 'bad');
+    fillForm(r.data); editRow = r.row; openForm();
+    toast('تم تحميل بياناتك، عدّلها ثم اضغط إرسال', 'ok');
+  } catch (e) { checkMsg('تعذّر الاتصال، تحقق من الإنترنت وحاول مجدداً', 'bad'); }
+  finally { busy(false); }
+});
+
+function fillForm(d) {
+  $('n1').value = d['الاسم_الأول'] || ''; $('n2').value = d['الاسم_الثاني'] || '';
+  $('n3').value = d['الاسم_الثالث'] || ''; $('n4').value = d['الاسم_الرابع'] || '';
+  $('nid').value = d['رقم_الهوية'] || ''; $('phone').value = d['رقم_الجوال'] || '';
+  $('dob').value = d['تاريخ_الميلاد'] || ''; $('edu').value = d['المؤهل_العلمي'] || '';
+  $('address').value = d['العنوان'] || '';
+  $('wallet').value = d['رقم_المحفظة'] || ''; $('wowner').value = d['اسم_صاحب_المحفظة'] || '';
+}
+
+$('consent-wrap').addEventListener('click', e => { if (e.target.id !== 'consent') $('consent').click(); });
+
+function validate() {
+  let ok = true;
+  const namesBad = ['n1', 'n2', 'n3', 'n4'].some(i => !$(i).value.trim());
+  $('e_names').classList.toggle('show', namesBad); if (namesBad) ok = false;
+  ok &= setErr('phone', !phoneOk($('phone').value.trim()));
+  const dv = $('dob').value, today = new Date().toISOString().slice(0, 10);
+  ok &= setErr('dob', !dv || dv >= today || dv < '1920-01-01');
+  ok &= setErr('edu', !$('edu').value);
+  ok &= setErr('address', $('address').value.trim().length < 5);
+  ok &= setErr('wallet', !/^\d{6,20}$/.test($('wallet').value.trim()));
+  ok &= setErr('wowner', $('wowner').value.trim().length < 3);
+  const cb = $('consent').checked;
+  $('consent-wrap').classList.toggle('err-consent', !cb); $('consent-err').classList.toggle('show', !cb); if (!cb) ok = false;
+  return !!ok;
+}
+
+$('frm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!validate()) {
+    toast('يرجى تصحيح الأخطاء أولاً', 'fail');
+    document.querySelector('.err, .emsg.show')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const names = ['n1', 'n2', 'n3', 'n4'].map(i => $(i).value.trim());
+  const payload = {
+    'الاسم_الأول': names[0], 'الاسم_الثاني': names[1], 'الاسم_الثالث': names[2], 'الاسم_الرابع': names[3],
+    'رقم_الهوية': $('nid').value.trim(), 'رقم_الجوال': $('phone').value.trim(),
+    'تاريخ_الميلاد': $('dob').value, 'المؤهل_العلمي': $('edu').value,
+    'العنوان': $('address').value.trim(),
+    'رقم_المحفظة': $('wallet').value.trim(), 'اسم_صاحب_المحفظة': $('wowner').value.trim()
+  };
+  if (editRow) payload._edit_row = editRow;
+  const btn = $('sbtn'); btn.disabled = true; btn.textContent = '⏳ جارٍ الإرسال...';
+  try {
+    // text/plain لتفادي طلب preflight مع Apps Script
+    const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+    const r = await res.json();
+    if (r.status === 'ok') { $('success-screen').classList.add('visible'); return; }
+    if (r.status === 'duplicate') toast('هذه الهوية مسجّلة مسبقاً', 'fail');
+    else toast('تعذّر الحفظ: ' + (r.message || 'خطأ غير معروف'), 'fail');
+  } catch (err) {
+    toast('تعذّر الإرسال، تحقق من الإنترنت وحاول مجدداً', 'fail');
+  } finally { btn.disabled = false; btn.textContent = '💾 إرسال البيانات'; }
+});
+</script>
+</body>
+</html>
